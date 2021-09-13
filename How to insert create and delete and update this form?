@@ -1,0 +1,280 @@
+this is my usertable ts codes:
+
+import { Component,OnInit, ViewChild } from '@angular/core';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { MatTable } from '@angular/material/table';
+
+import { UserLoginComponent } from '../user-login/user-login.component';
+import { EmployeeService } from '../shared/employee.service';
+
+export interface UserDataTable {
+  position: number;
+  empid: number;
+  name: string;
+  dob: string;
+  gender: string
+  des: string;
+  pname: string;
+}
+
+let EMPLOYEE_DATA: UserDataTable[] = [
+  {position: 1, empid: 1234, name: 'Check-1', dob: '07/09/2021', gender: 'male', des: 'Engineer', pname: 'Test-1'},
+  {position: 2, empid: 4567, name: 'Check-2', dob: '07/09/2021', gender: 'female', des: 'Software', pname: 'Test-2'},
+  {position: 3, empid: 7890, name: 'Check-3', dob: '07/09/2021', gender: 'male', des: 'Admin', pname: 'Test-3'},
+  {position: 4, empid: 1112, name: 'Check-4', dob: '07/09/2021', gender: 'female', des: 'Finance', pname: 'Test-4'},
+  {position: 5, empid: 1314, name: 'Check-5', dob: '07/09/2021', gender: 'other', des: 'Maintenance', pname: 'Test-5'}
+];
+
+@Component({
+  selector: 'app-table-other',
+  templateUrl: './table-other.component.html',
+  styleUrls: ['./table-other.component.css']
+})
+export class TableOtherComponent implements OnInit {
+
+  constructor(
+    private dialog: MatDialog,
+    ) {}
+
+  ngOnInit(): void {
+  }
+
+  displayedColumns: string[] = ['position', 'empid', 'name', 'dob', 'gender', 'des', 'pname', 'action'];
+  dataToDisplay = [...EMPLOYEE_DATA];
+  dataSource = (this.dataToDisplay);
+
+  @ViewChild(MatTable) table: MatTable<UserDataTable>;
+
+  openDialog() {
+    let dialogRef = this.dialog.open(UserLoginComponent, {
+      data :{I don't which data to provide this place}
+    });
+  }
+
+  onEdit() {
+    this.dialog.open(UserLoginComponent, {
+      data: {displayedColumns: this.displayedColumns}
+    });
+    this.table.renderRows();
+  }
+
+  onRemove() {
+  this.dataToDisplay = this.dataToDisplay.slice(0, -1);
+  this.dataSource.pop();
+  this.table.renderRows();
+  }
+}
+
+
+this is my usertable html codes:
+
+<div class="container">
+  <button mat-raised-button type="button" (click)="openDialog()" class="btn-style">ADD EMPLOYEE</button>
+</div>
+<div class="row">
+  <table mat-table [dataSource]="dataSource" class="mat-elevation-table">
+    <!-- Position Column -->
+    <ng-container matColumnDef="position">
+      <th mat-header-cell *matHeaderCellDef class="text-align">NO</th>
+      <td mat-cell *matCellDef="let element">{{element.position}}</td>
+    </ng-container>
+  
+    <!-- Employee ID Column -->
+    <ng-container matColumnDef="empid">
+      <th mat-header-cell *matHeaderCellDef class="text-align">EMPLOYEE ID</th>
+      <td mat-cell *matCellDef="let element">{{element.empid}}</td>
+    </ng-container>
+  
+    <!-- Name Column -->
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef class="text-align">NAME</th>
+      <td mat-cell *matCellDef="let element">{{element.name}}</td>
+    </ng-container>
+  
+    <!-- Date of Birth Column -->
+    <ng-container matColumnDef="dob">
+      <th mat-header-cell *matHeaderCellDef class="text-align">DATE OF BIRTH</th>
+      <td mat-cell *matCellDef="let element">{{element.dob}}</td>
+    </ng-container>
+  
+    <!-- Gender Column -->
+    <ng-container matColumnDef="gender">
+      <th mat-header-cell *matHeaderCellDef class="text-align">GENDER</th>
+      <td mat-cell *matCellDef="let element">{{element.gender}}</td>
+    </ng-container>
+  
+    <!-- Designation Column -->
+    <ng-container matColumnDef="des">
+      <th mat-header-cell *matHeaderCellDef class="text-align">DESIGNATION</th>
+      <td mat-cell *matCellDef="let element">{{element.des}}</td>
+    </ng-container>
+  
+    <!--Project Name Column -->
+    <ng-container matColumnDef="pname">
+      <th mat-header-cell *matHeaderCellDef class="text-align">PROJECT NAME</th>
+      <td mat-cell *matCellDef="let element">{{element.pname}}</td>
+    </ng-container>
+  
+    <!--Action Column -->
+    <ng-container matColumnDef="action">
+      <th mat-header-cell *matHeaderCellDef class="text-align">ACTION</th>
+      <td mat-cell *matCellDef="let element">{{element.action}}
+        <button mat-icon-button type="button" (click)="onEdit()"><mat-icon>edit</mat-icon></button> 
+        <button mat-icon-button type="button" (click)="onRemove()" ><mat-icon>delete</mat-icon></button>
+      </td>
+    </ng-container>
+  
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+</div>
+
+
+this is my user-login ts codes:
+
+import { Component, OnInit, Inject, Optional, ViewChild } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import { MatTable } from '@angular/material/table';
+import { MatSnackBar } from '@angular/material/snack-bar';
+
+export interface DialogUserData {
+  position: number,
+  empid: number;
+  name: string;
+  dob: string;
+  gender: string;
+  des: string;
+  pname: string;
+}
+
+@Component({
+  selector: 'app-user-login',
+  templateUrl: './user-login.component.html',
+  styleUrls: ['./user-login.component.css']   
+})
+export class UserLoginComponent implements OnInit {
+  loginform: FormGroup;
+  SubmitAttempt: boolean = false;
+  local_data: any;
+  action: string;
+ 
+  constructor(
+    private formBuilder: FormBuilder,
+    private snackbar: MatSnackBar,
+    public dialog: MatDialog,
+    public dialogRef: MatDialogRef<UserLoginComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: DialogUserData
+    ) {}
+
+    @ViewChild(MatTable) table: MatTable<DialogUserData>;
+
+
+  openDialog(): void {
+    this.dialog.open(UserLoginComponent, {restoreFocus: false});
+  }
+
+  ngOnInit() {
+    this.loginform = this.formBuilder.group({
+      empid: ['', Validators.required],
+      name: ['', Validators.required],
+      dob: ['', Validators.required],
+      gender: ['', Validators.required],
+      des: ['', Validators.required],
+      pname: ['', Validators.required],
+    });
+  }
+
+  getError(field: string) {
+    return (
+      (this.loginform.get(field).touched && this.loginform.get(field).untouched) ||
+      (this.loginform.get(field).valid && this.SubmitAttempt)
+    );
+  }
+
+  onSubmit() {
+    console.log('Submitted');
+    this.dialogRef.close({event: this.action, data: this.local_data})
+    if (this.loginform.value == ('')) {
+      this.SubmitAttempt = true;
+      this.snackbar.open('::', 'Submitted Successfully',{
+      duration: 2000,});
+    }
+    this.onNoClick();
+    }
+
+  onReset() {
+    console.log('Reset');
+    this.loginform.reset();
+    this.SubmitAttempt = false;
+  }
+
+  onNoClick(): void {
+    this.dialogRef.close();
+  }
+
+}
+
+
+this is my user-login html codes:
+
+<div class="container">
+    <mat-toolbar>
+        <span>EMPLOYEE DETAILS</span>
+        <button mat-stroked-button (click)="onNoClick()" class="btn-close"><mat-icon>close</mat-icon></button>
+    </mat-toolbar>
+    <div mat-dialog-content [formGroup]="loginform" (ngSubmit)="onSubmit()" class="row">
+        <mat-form-field>
+            <mat-label> Employee ID </mat-label>
+            <input matInput type="text" id="empid" formControlName="empid" class="form-control" required>                    
+            <mat-error *ngIf="getError">Employee ID is required</mat-error>
+        </mat-form-field><br>
+
+        <mat-form-field>
+            <mat-label> Name </mat-label>
+            <input matInput type="text" id="name" formControlName="name" class="form-control" required>
+            <mat-error *ngIf="getError">Name is required</mat-error>
+        </mat-form-field><br>
+
+        <mat-form-field>
+            <mat-label> Date of Birth </mat-label>
+            <input matInput [matDatepicker]="picker" placeholder="Choose a Date" required>
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            <input matInput id="dob" formControlName="dob" class="form-control" required>
+            <mat-error *ngIf="getError">Date of Birth is required</mat-error>
+        </mat-form-field><br><br>
+        
+        <section>
+            <mat-label> Gender </mat-label>
+            <mat-radio-group>
+                <mat-radio-button> Male </mat-radio-button>
+                <mat-radio-button value="after"> Female </mat-radio-button>
+                <mat-radio-button value="before"> Other </mat-radio-button>
+                <input matInput id="gender" formControlName="gender" class="form-control" required>
+            </mat-radio-group>
+        </section>
+
+        <mat-form-field>
+            <mat-label> Designation </mat-label>       
+                <mat-select>
+                    <mat-option value="one"> Admin </mat-option>
+                    <mat-option value="two"> Finance </mat-option>
+                    <mat-option value="three"> Engineer </mat-option>
+                    <input matInput type="text" id="des" formControlName="des" class="form-control" required>
+                    <mat-error *ngIf="getError">Designation is required</mat-error>
+                </mat-select>
+        </mat-form-field><br>
+
+        <mat-form-field>
+            <mat-label> Project Name </mat-label>
+            <input matInput type="text" id="pname" formControlName="pname" class="form-control" required>
+            <mat-error *ngIf="getError">Project Name is required</mat-error>
+        </mat-form-field><br>
+        
+        <div mat-dialog-actions>
+            <button mat-raised-button type="submit" (click)="onSubmit()">Submit</button>
+            <button mat-raised-button type="reset" (click)="onReset()">Reset</button>
+        </div>
+    </div>
+</div>
